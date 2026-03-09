@@ -99,33 +99,6 @@ Backend-приложение на Java (Spring Boot) для управления
 | Маскирование | **** **** **** 1234 для отображения |
 | Валидация | Jakarta Validation (@NotNull, @Pattern, etc.) |
 
----
-
-## 📁 Структура проекта
-src/
-├── main/
-│ ├── java/com.example.bankcards/
-│ │ ├── config/ # Конфигурации Security, OpenAPI
-│ │ ├── controller/ # REST контроллеры
-│ │ ├── dto/ # Data Transfer Objects
-│ │ ├── entity/ # JPA сущности
-│ │ ├── exception/ # Обработчики ошибок
-│ │ ├── repository/ # Репозитории
-│ │ ├── security/ # JWT фильтр, UserDetails
-│ │ ├── service/ # Бизнес-логика + тесты
-│ │ └── util/ # Утилиты (шифрование, маскирование)
-│ └── resources/
-│ └── db/migration/ # Liquibase миграции
-└── test/
-└── java/.../service/ # Юнит-тесты
----
-
-## 📊 Статус проекта
-
-| Модуль | Статус |
-|--------|--------|
-| Модуль 1-5 | ✅ Завершены |
-| Модуль 6 (Тесты, Swagger, README, Docker) | ✅ Завершён |
 
 ---
 
