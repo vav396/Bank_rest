@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.cards")
     List<User> findAllWithCards();
+
+    boolean existsByEmail(String email);
 }
