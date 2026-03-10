@@ -59,12 +59,15 @@ Backend-приложение на Java (Spring Boot) для управления
  ### 🔑 Права доступа
 
 ✅ Пользователь (USER)
+
 - Просмотр своих карт: GET /api/cards/me
 - Баланс карты: GET /api/cards/me/{id}/balance
 - Запрос на блокировку: POST /api/cards/me/{id}/block-request
 - Переводы между своими картами: POST /api/transfers
 - Создание новой карты: POST /api/cards
+
 ✅ Администратор (ADMIN)
+
 - Всё, что может USER +
 - Блокировка/активация любой карты: PUT /api/cards/{id}/block|activate
 - Удаление любой карты: DELETE /api/cards/{id}
