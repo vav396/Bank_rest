@@ -81,4 +81,55 @@ public class CardController {
         cardService.deleteCard(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * PUT /api/cards/{id}/block - Блокировать карту (только ADMIN)
+     */
+    @PutMapping("/{id}/block")
+    public ResponseEntity<CardDto> blockCard(@PathVariable Long id) {
+        log.info("Blocking card with id: {}", id);
+        CardDto blockedCard = cardService.blockCard(id);
+        return ResponseEntity.ok(blockedCard);
+    }
+
+    /**
+     * PUT /api/cards/{id}/activate - Активировать карту (только ADMIN)
+     */
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<CardDto> activateCard(@PathVariable Long id) {
+        log.info("Activating card with id: {}", id);
+        CardDto activatedCard = cardService.activateCard(id);
+        return ResponseEntity.ok(activatedCard);
+    }
+
+    /**
+     * POST /api/cards/me/{id}/block-request - Запросить блокировку карты (пользователь)
+     */
+    @PostMapping("/me/{id}/block-request")
+    public ResponseEntity<CardDto> requestBlockCard(@PathVariable Long id) {
+        log.info("Requesting block for card with id: {}", id);
+        CardDto blockedCard = cardService.requestBlockCard(id);
+        return ResponseEntity.ok(blockedCard);
+    }
+
+    /**
+     * GET /api/cards/me/{id}/balance - Получить баланс карты
+     */
+    @GetMapping("/me/{id}/balance")
+    public ResponseEntity<java.math.BigDecimal> getCardBalance(@PathVariable Long id) {
+        log.info("Getting balance for card with id: {}", id);
+        java.math.BigDecimal balance = cardService.getCardBalance(id);
+        return ResponseEntity.ok(balance);
+    }
+
+    /**
+     * GET /api/cards/me - Получить все карты текущего пользователя
+     */
+    @GetMapping("/me")
+    public ResponseEntity<Page<CardDto>> getMyCards(
+            @PageableDefault(size = 10) Pageable pageable) {
+        log.info("Getting cards for current user with pagination");
+        Page<CardDto> cards = cardService.getMyCards(pageable);
+        return ResponseEntity.ok(cards);
+    }
 }
