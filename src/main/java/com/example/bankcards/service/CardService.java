@@ -4,14 +4,17 @@ import com.example.bankcards.dto.CardDto;
 import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.repository.CardRepository;
+import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardEncryption;
 import com.example.bankcards.util.CardUtil;
 import com.example.bankcards.exception.CardNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -23,18 +26,27 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final CardEncryption cardEncryption;
+    private final UserRepository userRepository;
 
     // Создаёт новую карту
     @Transactional
     public CardDto createCard(CardDto cardDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        com.example.bankcards.entity.User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentUsername));
+
         Card card = toEntity(cardDto);
+        card.setUser(currentUser);
+
         String encryptedNumber = cardEncryption.encrypt(card.getNumber());
         card.setNumber(encryptedNumber);
         card.setCreatedAt(LocalDateTime.now());
         card.setUpdatedAt(LocalDateTime.now());
 
         Card savedCard = cardRepository.save(card);
-        log.info("Card created for user: {}", card.getUser().getId());
+        log.info("Card created for user: {}", currentUser.getId());
 
         return toDto(savedCard);
     }
