@@ -25,7 +25,7 @@ spring:
     change-log: classpath:db/migration/db.changelog-master.yaml
 
 jwt:
-  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs256
+  secret: MySuperSecretKeyForJWT2026BankCardsProjectMustBeLongEnough!
   expiration: 86400000
   refresh-expiration: 604800000
 

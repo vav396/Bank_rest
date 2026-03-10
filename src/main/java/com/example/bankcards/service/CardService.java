@@ -73,6 +73,20 @@ public class CardService {
         });
     }
 
+    /**
+     * Удаляет карту по ID (только ADMIN)
+     */
+    @Transactional
+    public void deleteCard(Long id) {
+        log.info("Deleting card with id: {}", id);
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + id));
+
+        cardRepository.delete(card);
+        log.info("Card deleted successfully: {}", id);
+    }
+
     // Маскирует номер карты для безопасного отображения
     public String getMaskedCardNumber(Long id) {
         CardDto card = getCardById(id);
