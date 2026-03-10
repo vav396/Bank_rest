@@ -71,4 +71,14 @@ public class CardController {
         String maskedNumber = cardService.getMaskedCardNumber(id);
         return ResponseEntity.ok(maskedNumber);
     }
+
+    /**
+     * DELETE /api/cards/{id} - Удалить карту (только ADMIN)
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCard(@PathVariable Long id) {
+        log.info("Deleting card with id: {}", id);
+        cardService.deleteCard(id);
+        return ResponseEntity.noContent().build();
+    }
 }
