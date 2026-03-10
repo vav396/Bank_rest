@@ -99,6 +99,108 @@ public class CardService {
         log.info("Card deleted successfully: {}", id);
     }
 
+    /**
+     * Блокирует карту (только ADMIN)
+     */
+    @Transactional
+    public CardDto blockCard(Long id) {
+        log.info("Blocking card with id: {}", id);
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + id));
+
+        card.setStatus(Card.CardStatus.BLOCKED);
+        card.setUpdatedAt(LocalDateTime.now());
+
+        Card savedCard = cardRepository.save(card);
+        log.info("Card blocked successfully: {}", id);
+
+        return toDto(savedCard);
+    }
+
+    /**
+     * Активирует карту (только ADMIN)
+     */
+    @Transactional
+    public CardDto activateCard(Long id) {
+        log.info("Activating card with id: {}", id);
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + id));
+
+        card.setStatus(Card.CardStatus.ACTIVE);
+        card.setUpdatedAt(LocalDateTime.now());
+
+        Card savedCard = cardRepository.save(card);
+        log.info("Card activated successfully: {}", id);
+
+        return toDto(savedCard);
+    }
+
+    /**
+     * Запрашивает блокировку карты (пользователь)
+     */
+    @Transactional
+    public CardDto requestBlockCard(Long cardId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        com.example.bankcards.entity.User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentUsername));
+
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
+        // Проверяем, что карта принадлежит текущему пользователю
+        if (!card.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You don't have permission to block this card");
+        }
+
+        card.setStatus(Card.CardStatus.BLOCKED);
+        card.setUpdatedAt(LocalDateTime.now());
+
+        Card savedCard = cardRepository.save(card);
+        log.info("Card block requested by user {}: {}", currentUsername, cardId);
+
+        return toDto(savedCard);
+    }
+
+    /**
+     * Получает баланс карты
+     */
+    @Transactional(readOnly = true)
+    public java.math.BigDecimal getCardBalance(Long cardId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        com.example.bankcards.entity.User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentUsername));
+
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
+        // Проверяем, что карта принадлежит текущему пользователю
+        if (!card.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You don't have permission to view this card balance");
+        }
+
+        return card.getBalance();
+    }
+
+    /**
+     * Получает все карты текущего пользователя
+     */
+    @Transactional(readOnly = true)
+    public Page<CardDto> getMyCards(Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        com.example.bankcards.entity.User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentUsername));
+
+        return getCardsByUserId(currentUser.getId(), pageable);
+    }
+
     // Маскирует номер карты для безопасного отображения
     public String getMaskedCardNumber(Long id) {
         CardDto card = getCardById(id);
